@@ -3,90 +3,6 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private float m_walkSpeed;
-    [SerializeField] private float m_runSpeed;
-    [SerializeField] private float m_crouchSpeed;
-    [SerializeField] private float m_acceleration;
-    [SerializeField] private float m_jumpHeight;
-
-    [Header("Inputs")]
-    [SerializeField] private float m_verticalInput;
-    [SerializeField] private float m_horizontalInput;
-    [SerializeField] private float m_mouseX;
-    [SerializeField] private float m_mouseY;
-    [SerializeField] private bool m_jumpInput;
-    [SerializeField] private bool m_sprintInput;
-    [SerializeField] private bool m_crouchInput;
-    [SerializeField] private bool m_shootInput;
-
-    private Rigidbody m_rb;
-    private void Start()
-    {
-        m_rb = GetComponent<Rigidbody>();
-    }
-    private void Update()
-    {
-        // inputs //
-        m_verticalInput = Input.GetAxisRaw("Vertical");
-        m_horizontalInput = Input.GetAxisRaw("Horizontal");
-        m_mouseX = Input.GetAxisRaw("Mouse X");
-        m_mouseY = Input.GetAxisRaw("Mouse Y");
-        m_jumpInput = Input.GetKey(KeyCode.Space);
-        m_sprintInput = Input.GetKey(KeyCode.LeftShift);
-        m_crouchInput = Input.GetKey(KeyCode.LeftControl);
-        m_shootInput = Input.GetKey(KeyCode.Mouse0);
-
-        CheckGround();
-    }
-    private void FixedUpdate()
-    {
-        Movement();
-        if (m_jumpInput && isGrounded) Jump();
-    }
-    private void Movement()
-    {
-        Vector3 finalVelocity = m_walkSpeed * (m_verticalInput * transform.forward + m_horizontalInput * transform.right).normalized;
-        Vector3 currentVelocity = m_rb.linearVelocity;
-        Vector3 moveForce = m_rb.mass * m_acceleration * (finalVelocity - currentVelocity);
-
-        m_rb.AddForce(moveForce);
-    }
-    private void Jump()
-    {
-        Vector3 jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * 20f) * Vector3.up;
-        m_rb.linearVelocity = new(m_rb.linearVelocity.x, 0f, m_rb.linearVelocity.z);
-        m_rb.AddForce(m_rb.mass * jumpVelocity, ForceMode.Impulse);
-    }
-    [SerializeField] private LayerMask groundLayers;
-    private bool isGrounded = true;
-    private void CheckGround()
-    {
-        Vector3 origin = new Vector3(transform.position.x, transform.position.y + 0.125f, transform.position.z);
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 0.125f, groundLayers))
-        {
-            isGrounded = true;
-        }else isGrounded = false;
-    }
-
-
-    /*Vector3 jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * m_jumpHeight) * Vector3.up;
-
-    // sets the vertical component of the players velocity to zero
-    m_rb.linearVelocity = new Vector3(m_rb.linearVelocity.x, 0f, m_rb.linearVelocity.z);
-
-    // adds the calculated force to the player
-    m_rb.AddForce(m_rb.mass* jumpVelocity, ForceMode.Impulse);*/
-
-    /*private void CheckGround() // simplified ground check
-    {
-        // The origin is set as 1x the ground distance above the player poistion
-        Vector3 origin = new(transform.position.x, transform.position.y + m_groundCheckDistance, transform.position.z);
-
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, m_groundCheckDistance, m_groundMask)) m_groundNormal = hit.normal;
-        else m_groundNormal = Vector3.up;
-    }*/
-
-
-    /*[SerializeField] private float m_walkSpeed;
     [SerializeField] private float m_crouchSpeed;
     [SerializeField] private float m_runSpeed;
     [SerializeField] private float m_moveAcceleration;
@@ -140,9 +56,9 @@ public class Player : MonoBehaviour
 
         UpdateCamera();
 
-        *//*if (m_sprintInput) m_currentSpeed = m_runSpeed;
+        if (m_sprintInput) m_currentSpeed = m_runSpeed;
         else if (m_crouchInput) m_currentSpeed = m_crouchSpeed;
-        else m_currentSpeed = m_walkSpeed;*//*
+        else m_currentSpeed = m_walkSpeed;
         m_currentSpeed = m_sprintInput ? m_runSpeed : m_crouchInput ? m_crouchSpeed : m_walkSpeed;
 
         CheckGround();
@@ -215,13 +131,13 @@ public class Player : MonoBehaviour
         }
         else m_isGrounded = false;
 
-        *//*// The ray is cast from the origin, down along Vector3.down, with the max distance of the ray being set to 2x the ground distance
+        // The ray is cast from the origin, down along Vector3.down, with the max distance of the ray being set to 2x the ground distance
         if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 2f * m_groundCheckDistance, m_groundMask))
         {
             m_isGrounded = true;
             m_groundNormal = hit.normal;
         }
-        else m_isGrounded = false;*//*
+        else m_isGrounded = false;
     }
     /// <summary>
     /// Updates the camera rotation based on the culmulative x and y positions of the mouse
@@ -238,7 +154,7 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, m_yRot, 0f); // applys the y rotation to the entire players global axis
     }
 
-
+    // Displays debug information on the screen
     void OnGUI()
     {
         GUIStyle debugStyle = new(GUI.skin.label)
@@ -248,5 +164,73 @@ public class Player : MonoBehaviour
         };
         string debugMessage = $"vertin: {m_verticalInput:F2}, horzin: {m_horizontalInput:F2}, jump: {m_jumpInput}, sprint: {m_sprintInput}, crouch: {m_crouchInput}\nfullVelocity: {m_rb.linearVelocity.magnitude:F1}";
         GUILayout.Label(debugMessage, debugStyle);
+    }
+
+
+    // What we covered in class //
+
+    /*[SerializeField] private float m_walkSpeed;
+    [SerializeField] private float m_runSpeed;
+    [SerializeField] private float m_crouchSpeed;
+    [SerializeField] private float m_acceleration;
+    [SerializeField] private float m_jumpHeight;
+
+    [Header("Inputs")]
+    [SerializeField] private float m_verticalInput;
+    [SerializeField] private float m_horizontalInput;
+    [SerializeField] private float m_mouseX;
+    [SerializeField] private float m_mouseY;
+    [SerializeField] private bool m_jumpInput;
+    [SerializeField] private bool m_sprintInput;
+    [SerializeField] private bool m_crouchInput;
+    [SerializeField] private bool m_shootInput;
+
+    private Rigidbody m_rb;
+    private void Start()
+    {
+        m_rb = GetComponent<Rigidbody>();
+    }
+    private void Update()
+    {
+        // inputs //
+        m_verticalInput = Input.GetAxisRaw("Vertical");
+        m_horizontalInput = Input.GetAxisRaw("Horizontal");
+        m_mouseX = Input.GetAxisRaw("Mouse X");
+        m_mouseY = Input.GetAxisRaw("Mouse Y");
+        m_jumpInput = Input.GetKey(KeyCode.Space);
+        m_sprintInput = Input.GetKey(KeyCode.LeftShift);
+        m_crouchInput = Input.GetKey(KeyCode.LeftControl);
+        m_shootInput = Input.GetKey(KeyCode.Mouse0);
+
+        CheckGround();
+    }
+    private void FixedUpdate()
+    {
+        Movement();
+        if (m_jumpInput && isGrounded) Jump();
+    }
+    private void Movement()
+    {
+        Vector3 finalVelocity = m_walkSpeed * (m_verticalInput * transform.forward + m_horizontalInput * transform.right).normalized;
+        Vector3 currentVelocity = m_rb.linearVelocity;
+        Vector3 moveForce = m_rb.mass * m_acceleration * (finalVelocity - currentVelocity);
+
+        m_rb.AddForce(moveForce);
+    }
+    private void Jump()
+    {
+        Vector3 jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * 20f) * Vector3.up;
+        m_rb.linearVelocity = new(m_rb.linearVelocity.x, 0f, m_rb.linearVelocity.z);
+        m_rb.AddForce(m_rb.mass * jumpVelocity, ForceMode.Impulse);
+    }
+    [SerializeField] private LayerMask groundLayers;
+    private bool isGrounded = true;
+    private void CheckGround()
+    {
+        Vector3 origin = new Vector3(transform.position.x, transform.position.y + 0.125f, transform.position.z);
+        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 0.125f, groundLayers))
+        {
+            isGrounded = true;
+        }else isGrounded = false;
     }*/
 }
